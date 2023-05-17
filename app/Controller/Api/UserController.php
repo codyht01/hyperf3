@@ -108,4 +108,12 @@ class UserController extends ApiBaseController
         return Show::success('ok', $result);
     }
 
+    public function updatePwdInfo(){
+        try {
+            $result = $this->obj_bus->updatePwdInfo($this->request->all());
+        } catch (\Exception $e) {
+            return Show::error($e->getMessage());
+        }
+        return Show::success('修改成功',$result);
+    }
 }

@@ -333,6 +333,56 @@ class UserBusiness extends BusBase
         }
     }
 
+    public function updatePwdInfo(array $data = [])
+    {
+
+        if(empty($data)){
+            throw new FooException("内部异常");
+        }
+        if(empty($data['pwd'])){
+            throw new FooException("请输入密码");
+        }
+        if(empty($data['new_pwd'])){
+            throw new FooException("请输入新密码");
+        }
+        if(empty($data['com_pwd'])){
+            throw new FooException("请输入确认密码");
+        }
+        if($data['com_pwd'] != $data['new_pwd']){
+            throw new FooException("两次密码不一致");
+        }
+        $user_id = $this->auth->guard('jwt')->id();
+
+        $user = $this->getBaseById($user_id);
+        if (empty($user)) {
+            throw new FooException("用户错误");
+        }
+        if(md5($data['pwd'].$user['code']) != $user['password']){
+            throw new FooException("原密码错误");
+        }
+        $update_data = [
+            "code"=>md5(Random::RandomStr())
+        ];
+        $update_data['password'] = md5($data['new_pwd'].$update_data['code']);
+        if ($update_data['password'] == $user['password']) {
+            throw new FooException("两次密码一致，无需修改");
+        }
+        try{
+            $res = $this->obj_model->where('id',$user['id'])->update($update_data);
+        }catch (\Exception $e){
+            throw new FooException("内部异常");
+        }
+        if($res){
+            $token = $this->auth->guard('jwt')->refresh();
+            return [
+                'token'=>$token
+            ];
+        }else{
+            throw new FooException("操作失败");
+        }
+
+    }
+
     /**
      * @return array
      */
