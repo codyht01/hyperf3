@@ -94,6 +94,7 @@ class UserController extends ApiBaseController
     }
 
     /**
+     * 修改用户信息
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
@@ -108,12 +109,35 @@ class UserController extends ApiBaseController
         return Show::success('ok', $result);
     }
 
-    public function updatePwdInfo(){
+    /**
+     * 修改密码
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function updatePwdInfo(): \Psr\Http\Message\ResponseInterface
+    {
         try {
             $result = $this->obj_bus->updatePwdInfo($this->request->all());
         } catch (\Exception $e) {
             return Show::error($e->getMessage());
         }
-        return Show::success('修改成功',$result);
+        return Show::success('修改成功', $result);
+    }
+
+    /**
+     * 修改用户头像
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function updateUserAvatar(): \Psr\Http\Message\ResponseInterface
+    {
+        try {
+            $result = $this->obj_bus->updateUserAvatar($this->request->input('url'));
+        } catch (\Exception $e) {
+            return Show::error($e->getMessage());
+        }
+        return Show::success('修改成功');
     }
 }

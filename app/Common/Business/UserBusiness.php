@@ -168,7 +168,7 @@ class UserBusiness extends BusBase
             throw new FooException("用户信息不存在");
         }
         try {
-            $row = (new User())->getBaseByIdInfo([['id', '=', $id]], ['id', 'userName', 'last_login_ip', 'last_login_time', 'create_time']);
+            $row = (new User())->getBaseByIdInfo([['id', '=', $id]], ['id', 'userName', 'last_login_ip', 'last_login_time', 'create_time', 'avatar_url']);
         } catch (\Exception $e) {
             throw new FooException($e->getMessage());
         }
@@ -177,8 +177,9 @@ class UserBusiness extends BusBase
         }
         return [
             'userName' => $row['userName'],
-            'photo' => "https://img2.baidu.com/it/u=1978192862,2048448374&fm=253&fmt=auto&app=138&f=JPEG?w=504&h=500",
+            'photo' => $row['avatar_url'],
             'time' => $row['create_time'],
+            'id' => $row['id'],
             'roles' => [],
             'authBtnList' => []
         ];
@@ -279,42 +280,7 @@ class UserBusiness extends BusBase
             }
         } else {
             // todo  验证手机号当不是自己的时候是否存在 邮箱不是自己的时候是否存在
-            //添加时验证用户名是否存在
-            try {
-                $user = User::query()
-                    ->where('userName', $data['userName'])
-                    ->where('id', '<>', $data['id'])
-                    ->first();
-            } catch (\Exception $e) {
-                throw new FooException("用户异常");
-            }
-            if ($user) {
-                throw new FooException("用户名已经存在");
-            }
-            //验证手机号
-            try {
-                $phone = User::query()
-                    ->where('phone', $data['phone'])
-                    ->where('id', '<>', $data['id'])
-                    ->first();
-            } catch (\Exception $e) {
-                throw new FooException("用户异常");
-            }
-            if ($phone) {
-                throw new FooException("该手机号已经存在");
-            }
-            //验证邮箱
-            try {
-                $email = User::query()
-                    ->where('email', $data['email'])
-                    ->where('id', '<>', $data['id'])
-                    ->first();
-            } catch (\Exception $e) {
-                throw new FooException("用户异常");
-            }
-            if ($email) {
-                throw new FooException("该邮箱地址已经存在");
-            }
+            $this->isVal($data);
         }
         try {
             if (empty($data['id'])) {
@@ -335,24 +301,67 @@ class UserBusiness extends BusBase
 
     /**
      * @param array $data
+     * @return void
+     */
+    protected function isVal(array $data)
+    {
+        //添加时验证用户名是否存在
+        try {
+            $user = User::query()
+                ->where('userName', $data['userName'])
+                ->where('id', '<>', $data['id'])
+                ->first();
+        } catch (\Exception $e) {
+            throw new FooException("用户异常");
+        }
+        if ($user) {
+            throw new FooException("用户名已经存在");
+        }
+        //验证手机号
+        try {
+            $phone = User::query()
+                ->where('phone', $data['phone'])
+                ->where('id', '<>', $data['id'])
+                ->first();
+        } catch (\Exception $e) {
+            throw new FooException("用户异常");
+        }
+        if ($phone) {
+            throw new FooException("该手机号已经存在");
+        }
+        //验证邮箱
+        try {
+            $email = User::query()
+                ->where('email', $data['email'])
+                ->where('id', '<>', $data['id'])
+                ->first();
+        } catch (\Exception $e) {
+            throw new FooException("用户异常");
+        }
+        if ($email) {
+            throw new FooException("该邮箱地址已经存在");
+        }
+    }
+
+    /**
+     * @param array $data
      * @return array
      */
     public function updatePwdInfo(array $data = [])
     {
-
-        if(empty($data)){
+        if (empty($data)) {
             throw new FooException("内部异常");
         }
-        if(empty($data['pwd'])){
+        if (empty($data['pwd'])) {
             throw new FooException("请输入密码");
         }
-        if(empty($data['new_pwd'])){
+        if (empty($data['new_pwd'])) {
             throw new FooException("请输入新密码");
         }
-        if(empty($data['com_pwd'])){
+        if (empty($data['com_pwd'])) {
             throw new FooException("请输入确认密码");
         }
-        if($data['com_pwd'] != $data['new_pwd']){
+        if ($data['com_pwd'] != $data['new_pwd']) {
             throw new FooException("两次密码不一致");
         }
         $user_id = $this->auth->guard('jwt')->id();
@@ -361,27 +370,27 @@ class UserBusiness extends BusBase
         if (empty($user)) {
             throw new FooException("用户错误");
         }
-        if(md5($data['pwd'].$user['code']) != $user['password']){
+        if (md5($data['pwd'] . $user['code']) != $user['password']) {
             throw new FooException("原密码错误");
         }
         $update_data = [
-            "code"=>md5(Random::RandomStr())
+            "code" => md5(Random::RandomStr())
         ];
-        $update_data['password'] = md5($data['new_pwd'].$update_data['code']);
+        $update_data['password'] = md5($data['new_pwd'] . $update_data['code']);
         if ($update_data['password'] == $user['password']) {
             throw new FooException("两次密码一致，无需修改");
         }
-        try{
-            $res = $this->obj_model->where('id',$user['id'])->update($update_data);
-        }catch (\Exception $e){
+        try {
+            $res = $this->obj_model->where('id', $user['id'])->update($update_data);
+        } catch (\Exception $e) {
             throw new FooException("内部异常");
         }
-        if($res){
+        if ($res) {
             $token = $this->auth->guard('jwt')->refresh();
             return [
-                'token'=>$token
+                'token' => $token
             ];
-        }else{
+        } else {
             throw new FooException("操作失败");
         }
 
@@ -415,7 +424,8 @@ class UserBusiness extends BusBase
                 "last_login_time" => $user['last_login_time'],
                 "status" => $user['status'],
                 "create_time" => $user['create_time'],
-                "id" => $user['id']
+                "id" => $user['id'],
+                "avatar_url" => $user['avatar_url']
             ];
         }
     }
@@ -429,23 +439,43 @@ class UserBusiness extends BusBase
         if (empty($data['sex']) || $data['sex'] == 0) {
             throw new FooException("请选择性别");
         }
-        $insert_data = [
-            "userName" => $data['userName'],
-            "autograph" => $data['autograph'],
-            "phone" => $data['phone'],
-            "email" => $data['email'],
-            "sex" => $data['sex'],
-        ];
         try {
             $res = User::query()->where('id', $this->auth->guard('jwt')->id())
-                ->update($insert_data);
+                ->update([
+                    "autograph" => $data['autograph'],
+                    "sex" => $data['sex']
+                ]);
         } catch (\Exception $e) {
-            throw new FooException("操作失败" . $e->getMessage());
+            throw new FooException("操作失败");
         }
         if ($res) {
             return true;
         } else {
             throw new FooException("更新失败");
+        }
+    }
+
+    /**
+     * @param string $url
+     * @return true
+     */
+    public function updateUserAvatar(string $url = '')
+    {
+        if (empty($url)) {
+            throw new FooException("头像为空");
+        }
+        try {
+            $res = User::query()->where('id', $this->auth->guard('jwt')->id())
+                ->update([
+                    "avatar_url" => $url
+                ]);
+        } catch (\Exception $e) {
+            throw new FooException("操作失败");
+        }
+        if ($res) {
+            return true;
+        } else {
+            throw new FooException("修改失败");
         }
     }
 }

@@ -45,6 +45,7 @@ Router::addServer('http', function () {
         Router::post('user/getUserListInfo', [UserController::class, 'getUserListInfo']);
         Router::post('user/updateUserInfo', [UserController::class, 'updateUserInfo']);
         Router::post('user/updatePwdInfo', [UserController::class, 'updatePwdInfo']);
+        Router::post('user/updateUserAvatar', [UserController::class, 'updateUserAvatar']);
         //角色相关
         Router::post('role/index', [\App\Controller\Api\RoleController::class, 'index']);
         Router::post('role/add', [\App\Controller\Api\RoleController::class, 'add']);
