@@ -333,6 +333,10 @@ class UserBusiness extends BusBase
         }
     }
 
+    /**
+     * @param array $data
+     * @return array
+     */
     public function updatePwdInfo(array $data = [])
     {
 
