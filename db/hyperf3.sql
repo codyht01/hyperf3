@@ -11,11 +11,98 @@
  Target Server Version : 80030 (8.0.30)
  File Encoding         : 65001
 
- Date: 16/05/2023 15:15:08
+ Date: 17/05/2023 16:25:26
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for hy_bargain_activity
+-- ----------------------------
+DROP TABLE IF EXISTS `hy_bargain_activity`;
+CREATE TABLE `hy_bargain_activity`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '活动名称',
+  `product_id` bigint UNSIGNED NOT NULL COMMENT '商品ID',
+  `start_time` datetime NOT NULL COMMENT '开始时间',
+  `end_time` datetime NOT NULL COMMENT '结束时间',
+  `min_price` decimal(10, 2) NOT NULL COMMENT '最低价',
+  `max_cut` int NOT NULL COMMENT '最大砍价次数',
+  `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态，0：未开始，1：进行中，2：已结束',
+  `create_time` int NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `update_time` int NOT NULL DEFAULT 0 COMMENT '修改时间',
+  `delete_time` int NULL DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '砍价活动表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of hy_bargain_activity
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for hy_bargain_record
+-- ----------------------------
+DROP TABLE IF EXISTS `hy_bargain_record`;
+CREATE TABLE `hy_bargain_record`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `activity_id` bigint UNSIGNED NOT NULL COMMENT '砍价活动ID',
+  `user_id` bigint UNSIGNED NOT NULL COMMENT '用户ID',
+  `current_price` decimal(10, 2) NOT NULL COMMENT '当前价格',
+  `cut_times` int NOT NULL COMMENT '已砍次数',
+  `create_time` int NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `update_time` int NOT NULL DEFAULT 0 COMMENT '更新时间',
+  `delete_time` int NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uniq_activity_user`(`activity_id` ASC, `user_id` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '砍价记录表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of hy_bargain_record
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for hy_commission
+-- ----------------------------
+DROP TABLE IF EXISTS `hy_commission`;
+CREATE TABLE `hy_commission`  (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '佣金id',
+  `product_id` int NOT NULL COMMENT '商品id',
+  `from_user_id` int NOT NULL COMMENT '佣金来源用户id',
+  `to_user_id` int NOT NULL COMMENT '佣金接收用户id',
+  `amount` decimal(10, 2) NOT NULL COMMENT '佣金金额',
+  `create_time` int NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `delete_time` int NULL DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_product_id`(`product_id` ASC) USING BTREE,
+  INDEX `idx_from_user_id`(`from_user_id` ASC) USING BTREE,
+  INDEX `idx_to_user_id`(`to_user_id` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '佣金表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of hy_commission
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for hy_coupon
+-- ----------------------------
+DROP TABLE IF EXISTS `hy_coupon`;
+CREATE TABLE `hy_coupon`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '优惠码',
+  `discount` decimal(10, 2) NOT NULL COMMENT '折扣金额',
+  `start_time` int NOT NULL DEFAULT 0 COMMENT '生效时间',
+  `end_time` int NOT NULL DEFAULT 0 COMMENT '过期时间',
+  `create_time` int NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `update_time` int NOT NULL DEFAULT 0 COMMENT '更新时间',
+  `delete_time` int NULL DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_coupon_code`(`code` ASC) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '优惠券表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of hy_coupon
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for hy_goods
@@ -71,7 +158,7 @@ CREATE TABLE `hy_goods`  (
 -- ----------------------------
 INSERT INTO `hy_goods` VALUES (1, '测试商品', 16, 1, 3, '多规格', 1, 2, 'http://vod.v.jstv.com/2021/04/09/JSTV_JSWS_1617981143954_5uynjqx_1767.mp4', 3, 2, 1.00, 3.00, 2.00, 64, '0', '0', 0, '<p>{</p><p> &nbsp; &nbsp;\"id\": \"0\",</p><p> &nbsp; &nbsp;\"type\": 1,</p><p> &nbsp; &nbsp;\"title\": \"测试商品\",</p><p> &nbsp; &nbsp;\"category_id\": 3,</p><p> &nbsp; &nbsp;\"unit\": \"单规格\",</p><p> &nbsp; &nbsp;\"is_video\": 1,</p><p> &nbsp; &nbsp;\"video_type\": 2,</p><p> &nbsp; &nbsp;\"video_url\": \"\",</p><p> &nbsp; &nbsp;\"status\": 1,</p><p> &nbsp; &nbsp;\"specification\": 1,</p><p> &nbsp; &nbsp;\"price\": 1,</p><p> &nbsp; &nbsp;\"market_price\": 2,</p><p> &nbsp; &nbsp;\"cost_price\": 3,</p><p> &nbsp; &nbsp;\"stock\": 21,</p><p> &nbsp; &nbsp;\"product_id\": 0,</p><p> &nbsp; &nbsp;\"weight\": 0,</p><p> &nbsp; &nbsp;\"volume\": 0,</p><p> &nbsp; &nbsp;\"description\": \"&lt;p&gt;1、前言&lt;/p&gt;&lt;p&gt;很多时候我们需要获取一个结构未知的文件夹下所有的文件或是指定类型的所有文件，在C#中可以通过递归实现，下面给出实现代码。我这里新建了一个测试文件夹，其结构如下所示：&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;测试文件夹/&lt;/p&gt;&lt;p&gt; &nbsp;├─文件夹1&lt;/p&gt;&lt;p&gt; &nbsp;│ &nbsp; └─1_1.docx&lt;/p&gt;&lt;p&gt; &nbsp;│ &nbsp; └─1_2.docx &lt;/p&gt;&lt;p&gt; &nbsp;└─文件夹2&lt;/p&gt;&lt;p&gt; &nbsp;│ &nbsp; └─2_1.pptx&lt;/p&gt;&lt;p&gt; &nbsp;│ &nbsp; └─2_2.pptx &lt;/p&gt;&lt;p&gt; &nbsp;│ &nbsp; └─文件夹3&lt;/p&gt;&lt;p&gt; &nbsp;│ &nbsp; &nbsp; &nbsp;└─3_1.xlsx&lt;/p&gt;&lt;p&gt; &nbsp;│ &nbsp; &nbsp; &nbsp;└─3_2.xlsx&lt;/p&gt;&lt;p&gt; &nbsp;│ &nbsp; &nbsp; &nbsp;└─文件夹4&lt;/p&gt;&lt;p&gt; &nbsp;│ &nbsp; &nbsp; &nbsp; &nbsp; └─4_1.bmp&lt;/p&gt;&lt;p&gt; &nbsp;│ &nbsp; &nbsp; &nbsp; &nbsp; └─4_2.bmp&lt;/p&gt;&lt;p&gt;1&lt;/p&gt;&lt;p&gt;2&lt;/p&gt;&lt;p&gt;3&lt;/p&gt;&lt;p&gt;4&lt;/p&gt;&lt;p&gt;5&lt;/p&gt;&lt;p&gt;6&lt;/p&gt;&lt;p&gt;7&lt;/p&gt;&lt;p&gt;8&lt;/p&gt;&lt;p&gt;9&lt;/p&gt;&lt;p&gt;10&lt;/p&gt;&lt;p&gt;11&lt;/p&gt;&lt;p&gt;12&lt;/p&gt;&lt;p&gt;13&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;2、获取全部文件&lt;/p&gt;&lt;p&gt;获取全部文件代码如下：&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;using System;&lt;/p&gt;&lt;p&gt;using System.Collections.Generic;&lt;/p&gt;&lt;p&gt;using System.IO;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;namespace App&lt;/p&gt;&lt;p&gt;{&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp;class Program&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp;{&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp;static void Main(string[] args)&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp;{&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;List&lt;string&gt; files = GetFiles(@\\\"D:\\\\测试文件夹\\\");&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;foreach (var item in files)&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Console.WriteLine(item);&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;}&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Console.ReadKey();&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp;}&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp;static List&lt;string&gt; GetFiles(string directory, string pattern = \\\"*.*\\\")&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp;{&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;List&lt;string&gt; files = new List&lt;string&gt;();&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;foreach (var item in Directory.GetFiles(directory, pattern))&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;files.Add(item);&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;}&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;foreach (var item in Directory.GetDirectories(directory))&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;files.AddRange(GetFiles(item, pattern));&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;}&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;return files;&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp; &nbsp; &nbsp;}&lt;/p&gt;&lt;p&gt; &nbsp; &nbsp;}&lt;/p&gt;&lt;p&gt;}&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;1&lt;/p&gt;&lt;p&gt;2&lt;/p&gt;&lt;p&gt;3&lt;/p&gt;&lt;p&gt;4&lt;/p&gt;&lt;p&gt;5&lt;/p&gt;&lt;p&gt;6&lt;/p&gt;&lt;p&gt;7&lt;/p&gt;&lt;p&gt;8&lt;/p&gt;&lt;p&gt;9&lt;/p&gt;&lt;p&gt;10&lt;/p&gt;&lt;p&gt;11&lt;/p&gt;&lt;p&gt;12&lt;/p&gt;&lt;p&gt;13&lt;/p&gt;&lt;p&gt;14&lt;/p&gt;&lt;p&gt;15&lt;/p&gt;&lt;p&gt;16&lt;/p&gt;&lt;p&gt;17&lt;/p&gt;&lt;p&gt;18&lt;/p&gt;&lt;p&gt;19&lt;/p&gt;&lt;p&gt;20&lt;/p&gt;&lt;p&gt;21&lt;/p&gt;&lt;p&gt;22&lt;/p&gt;&lt;p&gt;23&lt;/p&gt;&lt;p&gt;24&lt;/p&gt;&lt;p&gt;25&lt;/p&gt;&lt;p&gt;26&lt;/p&gt;&lt;p&gt;27&lt;/p&gt;&lt;p&gt;28&lt;/p&gt;&lt;p&gt;29&lt;/p&gt;&lt;p&gt;30&lt;/p&gt;&lt;p&gt;31&lt;/p&gt;&lt;p&gt;32&lt;/p&gt;&lt;p&gt;33&lt;/p&gt;&lt;p&gt;结果如下图所示：&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;D:\\\\测试文件夹\\\\文件夹1\\\\1_1.docx&lt;/p&gt;&lt;p&gt;D:\\\\测试文件夹\\\\文件夹1\\\\1_2.docx&lt;/p&gt;&lt;p&gt;D:\\\\测试文件夹\\\\文件夹2\\\\2_1.pptx&lt;/p&gt;&lt;p&gt;D:\\\\测试文件夹\\\\文件夹2\\\\2_2.pptx&lt;/p&gt;&lt;p&gt;D:\\\\测试文件夹\\\\文件夹2\\\\文件夹3\\\\3_1.xlsx&lt;/p&gt;&lt;p&gt;D:\\\\测试文件夹\\\\文件夹2\\\\文件夹3\\\\3_2.xlsx&lt;/p&gt;&lt;p&gt;D:\\\\测试文件夹\\\\文件夹2\\\\文件夹3\\\\文件夹4\\\\4_1.bmp&lt;/p&gt;&lt;p&gt;D:\\\\测试文件夹\\\\文件夹2\\\\文件夹3\\\\文件夹4\\\\4_2.bmp&lt;/p&gt;&lt;p&gt;1&lt;/p&gt;&lt;p&gt;2&lt;/p&gt;&lt;p&gt;3&lt;/p&gt;&lt;p&gt;4&lt;/p&gt;&lt;p&gt;5&lt;/p&gt;&lt;p&gt;6&lt;/p&gt;&lt;p&gt;7&lt;/p&gt;&lt;p&gt;8&lt;/p&gt;&lt;p&gt;3、获取指定类型文件&lt;/p&gt;&lt;p&gt;————————————————&lt;/p&gt;&lt;p&gt;版权声明：本文为CSDN博主「HerryDong」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。&lt;/p&gt;&lt;p&gt;原文链接：https://blog.csdn.net/HerryDong/article/details/103250077&lt;/p&gt;\",</p><p> &nbsp; &nbsp;\"logistics_type\": [</p><p> &nbsp; &nbsp; &nbsp; &nbsp;\"1\"</p><p> &nbsp; &nbsp;],</p><p> &nbsp; &nbsp;\"logistics_cate\": 1,</p><p> &nbsp; &nbsp;\"logistics_price\": 0,</p><p> &nbsp; &nbsp;\"logistics_formwork\": 0,</p><p> &nbsp; &nbsp;\"number\": 0,</p><p> &nbsp; &nbsp;\"sort\": 0,</p><p> &nbsp; &nbsp;\"integral\": 10,</p><p> &nbsp; &nbsp;\"is_purchase\": 0,</p><p> &nbsp; &nbsp;\"purchase_type\": 1,</p><p> &nbsp; &nbsp;\"purchase_number\": 0,</p><p> &nbsp; &nbsp;\"is_booking\": 0,</p><p> &nbsp; &nbsp;\"booking_time\": 0,</p><p> &nbsp; &nbsp;\"booking_send_time\": 0,</p><p> &nbsp; &nbsp;\"recommend\": [</p><p> &nbsp; &nbsp; &nbsp; &nbsp;1,</p><p> &nbsp; &nbsp; &nbsp; &nbsp;2,</p><p> &nbsp; &nbsp; &nbsp; &nbsp;3</p><p> &nbsp; &nbsp;],</p><p> &nbsp; &nbsp;\"title_keywords\": \"\",</p><p> &nbsp; &nbsp;\"title_description\": \"\",</p><p> &nbsp; &nbsp;\"sku_data\": [],</p><p> &nbsp; &nbsp;\"banner\": [</p><p> &nbsp; &nbsp; &nbsp; &nbsp;{</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"id\": 23,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"url\": \"/public/image/2023-03-24/af08df99616e3e4f1038b161ffcdaf70.jpeg\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"cate_id\": 0,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"md5\": \"af08df99616e3e4f1038b161ffcdaf70\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"size\": \"\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"fileName\": \"ChMkLGN1liWIUfnuAACT6RmJ2J0AAJvMQJvgaUAAJQB562.jpg\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"type\": \"image\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"ext\": \"jpeg\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"upload_ip\": 3232235529,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"status\": 1,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"create_time\": \"0\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"update_time\": \"0\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"delete_time\": null,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"checked\": true</p><p> &nbsp; &nbsp; &nbsp; &nbsp;},</p><p> &nbsp; &nbsp; &nbsp; &nbsp;{</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"id\": 24,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"url\": \"/public/image/2023-03-24/f45e58d0a0c8dad652a12ad3c7963c0d.jpeg\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"cate_id\": 0,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"md5\": \"f45e58d0a0c8dad652a12ad3c7963c0d\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"size\": \"\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"fileName\": \"ChMkK2N1li6IKrkVAAEAb8Nx1agAAJvMQMkV5cAAQCH804.jpg\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"type\": \"image\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"ext\": \"jpeg\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"upload_ip\": 3232235529,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"status\": 1,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"create_time\": \"0\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"update_time\": \"0\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"delete_time\": null,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"checked\": true</p><p> &nbsp; &nbsp; &nbsp; &nbsp;},</p><p> &nbsp; &nbsp; &nbsp; &nbsp;{</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"id\": 26,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"url\": \"/public/image/2023-03-24/cadae5ccd8bfe93c4f80446a1bac899a.jpeg\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"cate_id\": 0,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"md5\": \"cadae5ccd8bfe93c4f80446a1bac899a\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"size\": \"\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"fileName\": \"ChMkLGN1liiIOiwvAAED3OG0Qq0AAJvMQKvM3wAAQP0820.jpg\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"type\": \"image\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"ext\": \"jpeg\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"upload_ip\": 3232235529,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"status\": 1,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"create_time\": \"0\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"update_time\": \"0\",</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"delete_time\": null,</p><p> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\"checked\": true</p><p> &nbsp; &nbsp; &nbsp; &nbsp;}</p><p> &nbsp; &nbsp;],</p><p> &nbsp; &nbsp;\"goods_img\": \"/public/image/2023-03-22/d7c22a4d1baca0ae99bc4d55f1abd534.jpeg\"</p><p>}<img src=\"/public/image/7c70cb048c20e4f883fae48e489b14cf.jpg\" alt=\"\" data-href=\"\" style=\"\"/></p>', '[\"1\"]', 1, 0.00, 0, 0, 0, 0, 1, 0, 0, 0, '[1, 2, 3]', '', '', NULL, 1680315459, 1680316013, '[\"/public/image/2023-03-24/af08df99616e3e4f1038b161ffcdaf70.jpeg\", \"/public/image/2023-03-24/f45e58d0a0c8dad652a12ad3c7963c0d.jpeg\", \"/public/image/2023-03-24/cadae5ccd8bfe93c4f80446a1bac899a.jpeg\"]', '/public/image/2023-03-22/d7c22a4d1baca0ae99bc4d55f1abd534.jpeg', 0, 0, 0);
 INSERT INTO `hy_goods` VALUES (2, '测试商品', 75, 1, 3, '111', 0, 1, '', 1, 2, 1.00, 3.00, 2.00, 480, '0', '0', 0, '&lt;p&gt;1、前言&lt;/p&gt;&lt;p&gt;很多时候我们需要获取一个结构未知的文件夹下所有的文件或是指定类型的所有文件，在C#中可以通过递归实现，下面给出实现代码。我这里新建了一个测试文件夹，其结构如下所示：&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;测试文件夹/&lt;/p&gt;&lt;p&gt; &amp;nbsp;├─文件夹1&lt;/p&gt;&lt;p&gt; &amp;nbsp;│ &amp;nbsp; └─1_1.docx&lt;/p&gt;&lt;p&gt; &amp;nbsp;│ &amp;nbsp; └─1_2.docx &lt;/p&gt;&lt;p&gt; &amp;nbsp;└─文件夹2&lt;/p&gt;&lt;p&gt; &amp;nbsp;│ &amp;nbsp; └─2_1.pptx&lt;/p&gt;&lt;p&gt; &amp;nbsp;│ &amp;nbsp; └─2_2.pptx &lt;/p&gt;&lt;p&gt; &amp;nbsp;│ &amp;nbsp; └─文件夹3&lt;/p&gt;&lt;p&gt; &amp;nbsp;│ &amp;nbsp; &amp;nbsp; &amp;nbsp;└─3_1.xlsx&lt;/p&gt;&lt;p&gt; &amp;nbsp;│ &amp;nbsp; &amp;nbsp; &amp;nbsp;└─3_2.xlsx&lt;/p&gt;&lt;p&gt; &amp;nbsp;│ &amp;nbsp; &amp;nbsp; &amp;nbsp;└─文件夹4&lt;/p&gt;&lt;p&gt; &amp;nbsp;│ &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; └─4_1.bmp&lt;/p&gt;&lt;p&gt; &amp;nbsp;│ &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; └─4_2.bmp&lt;/p&gt;&lt;p&gt;1&lt;/p&gt;&lt;p&gt;2&lt;/p&gt;&lt;p&gt;3&lt;/p&gt;&lt;p&gt;4&lt;/p&gt;&lt;p&gt;5&lt;/p&gt;&lt;p&gt;6&lt;/p&gt;&lt;p&gt;7&lt;/p&gt;&lt;p&gt;8&lt;/p&gt;&lt;p&gt;9&lt;/p&gt;&lt;p&gt;10&lt;/p&gt;&lt;p&gt;11&lt;/p&gt;&lt;p&gt;12&lt;/p&gt;&lt;p&gt;13&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;2、获取全部文件&lt;/p&gt;&lt;p&gt;获取全部文件代码如下：&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;using System;&lt;/p&gt;&lt;p&gt;using System.Collections.Generic;&lt;/p&gt;&lt;p&gt;using System.IO;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;namespace App&lt;/p&gt;&lt;p&gt;{&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp;class Program&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp;{&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;static void Main(string[] args)&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;{&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;List&lt;string&gt; files = GetFiles(@&quot;D:\\测试文件夹&quot;);&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;foreach (var item in files)&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;{&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;Console.WriteLine(item);&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;}&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;Console.ReadKey();&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;}&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;static List&lt;string&gt; GetFiles(string directory, string pattern = &quot;*.*&quot;)&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;{&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;List&lt;string&gt; files = new List&lt;string&gt;();&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;foreach (var item in Directory.GetFiles(directory, pattern))&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;{&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;files.Add(item);&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;}&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;foreach (var item in Directory.GetDirectories(directory))&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;{&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;files.AddRange(GetFiles(item, pattern));&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;}&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;return files;&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;}&lt;/p&gt;&lt;p&gt; &amp;nbsp; &amp;nbsp;}&lt;/p&gt;&lt;p&gt;}&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;1&lt;/p&gt;&lt;p&gt;2&lt;/p&gt;&lt;p&gt;3&lt;/p&gt;&lt;p&gt;4&lt;/p&gt;&lt;p&gt;5&lt;/p&gt;&lt;p&gt;6&lt;/p&gt;&lt;p&gt;7&lt;/p&gt;&lt;p&gt;8&lt;/p&gt;&lt;p&gt;9&lt;/p&gt;&lt;p&gt;10&lt;/p&gt;&lt;p&gt;11&lt;/p&gt;&lt;p&gt;12&lt;/p&gt;&lt;p&gt;13&lt;/p&gt;&lt;p&gt;14&lt;/p&gt;&lt;p&gt;15&lt;/p&gt;&lt;p&gt;16&lt;/p&gt;&lt;p&gt;17&lt;/p&gt;&lt;p&gt;18&lt;/p&gt;&lt;p&gt;19&lt;/p&gt;&lt;p&gt;20&lt;/p&gt;&lt;p&gt;21&lt;/p&gt;&lt;p&gt;22&lt;/p&gt;&lt;p&gt;23&lt;/p&gt;&lt;p&gt;24&lt;/p&gt;&lt;p&gt;25&lt;/p&gt;&lt;p&gt;26&lt;/p&gt;&lt;p&gt;27&lt;/p&gt;&lt;p&gt;28&lt;/p&gt;&lt;p&gt;29&lt;/p&gt;&lt;p&gt;30&lt;/p&gt;&lt;p&gt;31&lt;/p&gt;&lt;p&gt;32&lt;/p&gt;&lt;p&gt;33&lt;/p&gt;&lt;p&gt;结果如下图所示：&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;D:\\测试文件夹\\文件夹1\\1_1.docx&lt;/p&gt;&lt;p&gt;D:\\测试文件夹\\文件夹1\\1_2.docx&lt;/p&gt;&lt;p&gt;D:\\测试文件夹\\文件夹2\\2_1.pptx&lt;/p&gt;&lt;p&gt;D:\\测试文件夹\\文件夹2\\2_2.pptx&lt;/p&gt;&lt;p&gt;D:\\测试文件夹\\文件夹2\\文件夹3\\3_1.xlsx&lt;/p&gt;&lt;p&gt;D:\\测试文件夹\\文件夹2\\文件夹3\\3_2.xlsx&lt;/p&gt;&lt;p&gt;D:\\测试文件夹\\文件夹2\\文件夹3\\文件夹4\\4_1.bmp&lt;/p&gt;&lt;p&gt;D:\\测试文件夹\\文件夹2\\文件夹3\\文件夹4\\4_2.bmp&lt;/p&gt;&lt;p&gt;1&lt;/p&gt;&lt;p&gt;2&lt;/p&gt;&lt;p&gt;3&lt;/p&gt;&lt;p&gt;4&lt;/p&gt;&lt;p&gt;5&lt;/p&gt;&lt;p&gt;6&lt;/p&gt;&lt;p&gt;7&lt;/p&gt;&lt;p&gt;8&lt;/p&gt;&lt;p&gt;3、获取指定类型文件&lt;/p&gt;&lt;p&gt;————————————————&lt;/p&gt;&lt;p&gt;版权声明：本文为CSDN博主「HerryDong」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。&lt;/p&gt;&lt;p&gt;原文链接：https://blog.csdn.net/HerryDong/article/details/103250077&lt;/p&gt;', '[\"1\"]', 1, 0.00, 0, 0, 0, 0, 1, 0, 0, 0, '[1, 2, 3]', '', '', NULL, 1684219339, 1684219339, '[\"/public/image/2023-03-24/af08df99616e3e4f1038b161ffcdaf70.jpeg\", \"/public/image/2023-03-24/f45e58d0a0c8dad652a12ad3c7963c0d.jpeg\", \"/public/image/2023-03-24/cadae5ccd8bfe93c4f80446a1bac899a.jpeg\", \"/public/image/2023-03-24/1e55ea5a72fdf654a011517737e07d0c.jpeg\"]', '/public/image/2023-03-22/d7c22a4d1baca0ae99bc4d55f1abd534.jpeg', 0, 0, 0);
-INSERT INTO `hy_goods` VALUES (6, '单规格', 78, 1, 3, '件', 0, 1, '', 1, 1, 1.00, 10.00, 1.00, 1, '0', '0', 0, '&lt;p&gt;这是描述文件&lt;/p&gt;', '[\"1\"]', 1, 100.00, 0, 1, 3, 1, 2, 4, 1, 10, '[2, 1, 3]', '1', '2', NULL, 1680510133, 1680510133, '[\"/public/image/2023-03-24/ae752e825c6b49875e13d9f5ea15b67c.jpeg\", \"/public/image/2023-03-24/cadae5ccd8bfe93c4f80446a1bac899a.jpeg\", \"/public/image/2023-03-24/1e55ea5a72fdf654a011517737e07d0c.jpeg\"]', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1680710400, 1685030400, 2);
+INSERT INTO `hy_goods` VALUES (6, '单规格', 80, 1, 3, '件', 0, 1, '', 0, 1, 1.00, 10.00, 1.00, 20, '0', '0', 0, '&lt;p&gt;这是描述文件&lt;/p&gt;', '[\"1\"]', 1, 100.00, 0, 1, 3, 1, 2, 4, 1, 10, '[2, 1, 3]', '1', '2', NULL, 1684221896, 1684221896, '[\"/public/image/2023-03-24/ae752e825c6b49875e13d9f5ea15b67c.jpeg\", \"/public/image/2023-03-24/cadae5ccd8bfe93c4f80446a1bac899a.jpeg\", \"/public/image/2023-03-24/1e55ea5a72fdf654a011517737e07d0c.jpeg\"]', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1680710400, 1685030400, 2);
 
 -- ----------------------------
 -- Table structure for hy_goods_category
@@ -116,7 +203,7 @@ CREATE TABLE `hy_goods_sku`  (
   `update_time` int NOT NULL DEFAULT 0,
   `delete_time` int NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 79 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '商品sku表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 81 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '商品sku表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of hy_goods_sku
@@ -146,7 +233,7 @@ INSERT INTO `hy_goods_sku` VALUES (22, 2, '26,21', '/public/image/2023-03-22/775
 INSERT INTO `hy_goods_sku` VALUES (23, 2, '25,23', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1.00, 3.00, 10.00, 4, '', 1, 1680504169, 1680509484, 1680509484);
 INSERT INTO `hy_goods_sku` VALUES (24, 2, '25,22', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1.00, 3.00, 2.00, 4, '', 1, 1680504169, 1680509484, 1680509484);
 INSERT INTO `hy_goods_sku` VALUES (25, 2, '25,21', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1.00, 3.00, 2.00, 4, '', 1, 1680504169, 1680509484, 1680509484);
-INSERT INTO `hy_goods_sku` VALUES (27, 6, '', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1.00, 10.00, 1.00, 1, '', 1, 1680510133, 1680510133, NULL);
+INSERT INTO `hy_goods_sku` VALUES (27, 6, '', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1.00, 10.00, 1.00, 20, '', 1, 1684221896, 1684221896, NULL);
 INSERT INTO `hy_goods_sku` VALUES (28, 2, '21,25,9', '/public/image/2023-03-22/d7c22a4d1baca0ae99bc4d55f1abd534.jpeg', 1.00, 3.00, 2.00, 10, '', 1, 1684219339, 1684219339, NULL);
 INSERT INTO `hy_goods_sku` VALUES (29, 2, '21,25,8', '/public/image/2023-03-22/d7c22a4d1baca0ae99bc4d55f1abd534.jpeg', 1.00, 3.00, 2.00, 10, '', 1, 1684219339, 1684219339, NULL);
 INSERT INTO `hy_goods_sku` VALUES (30, 2, '21,25,7', '/public/image/2023-03-22/d7c22a4d1baca0ae99bc4d55f1abd534.jpeg', 1.00, 3.00, 2.00, 10, '', 1, 1684219339, 1684219339, NULL);
@@ -195,9 +282,54 @@ INSERT INTO `hy_goods_sku` VALUES (72, 2, '20,27,7', '/public/image/2023-03-22/d
 INSERT INTO `hy_goods_sku` VALUES (73, 2, '20,24,9', '/public/image/2023-03-22/d7c22a4d1baca0ae99bc4d55f1abd534.jpeg', 1.00, 3.00, 2.00, 10, '', 1, 1684219339, 1684219339, NULL);
 INSERT INTO `hy_goods_sku` VALUES (74, 2, '20,24,8', '/public/image/2023-03-22/d7c22a4d1baca0ae99bc4d55f1abd534.jpeg', 1.00, 3.00, 2.00, 10, '', 1, 1684219339, 1684219339, NULL);
 INSERT INTO `hy_goods_sku` VALUES (75, 2, '20,24,7', '/public/image/2023-03-22/d7c22a4d1baca0ae99bc4d55f1abd534.jpeg', 1.00, 3.00, 2.00, 10, '', 1, 1684219339, 1684219339, NULL);
-INSERT INTO `hy_goods_sku` VALUES (76, 6, '', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1.00, 10.00, 1.00, 1, '', 1, 1680510133, 1680510133, NULL);
-INSERT INTO `hy_goods_sku` VALUES (77, 6, '', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1.00, 10.00, 1.00, 1, '', 1, 1680510133, 1680510133, NULL);
-INSERT INTO `hy_goods_sku` VALUES (78, 6, '', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1.00, 10.00, 1.00, 1, '', 1, 1680510133, 1680510133, NULL);
+INSERT INTO `hy_goods_sku` VALUES (76, 6, '', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1.00, 10.00, 1.00, 20, '', 1, 1684221896, 1684221896, NULL);
+INSERT INTO `hy_goods_sku` VALUES (77, 6, '', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1.00, 10.00, 1.00, 20, '', 1, 1684221896, 1684221896, NULL);
+INSERT INTO `hy_goods_sku` VALUES (78, 6, '', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1.00, 10.00, 1.00, 20, '', 1, 1684221896, 1684221896, NULL);
+INSERT INTO `hy_goods_sku` VALUES (79, 6, '', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1.00, 10.00, 1.00, 20, '', 1, 1684221896, 1684221896, NULL);
+INSERT INTO `hy_goods_sku` VALUES (80, 6, '', '/public/image/2023-03-22/775a83ebe950baf4c353f63855f8e808.png', 1.00, 10.00, 1.00, 20, '', 1, 1684221896, 1684221896, NULL);
+
+-- ----------------------------
+-- Table structure for hy_group_buying_activity
+-- ----------------------------
+DROP TABLE IF EXISTS `hy_group_buying_activity`;
+CREATE TABLE `hy_group_buying_activity`  (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '拼团活动id',
+  `product_id` int NOT NULL COMMENT '商品id',
+  `price` decimal(10, 2) NOT NULL COMMENT '团购价',
+  `group_size` int NOT NULL COMMENT '成团人数',
+  `start_time` datetime NOT NULL COMMENT '开始时间',
+  `end_time` datetime NOT NULL COMMENT '结束时间',
+  `create_time` int NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `update_time` int NOT NULL DEFAULT 0 COMMENT '更新时间',
+  `delete_time` int NULL DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_product_id`(`product_id` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '拼团活动表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of hy_group_buying_activity
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for hy_group_buying_record
+-- ----------------------------
+DROP TABLE IF EXISTS `hy_group_buying_record`;
+CREATE TABLE `hy_group_buying_record`  (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '拼团记录id',
+  `activity_id` int NOT NULL COMMENT '拼团活动id',
+  `user_id` int NOT NULL COMMENT '用户id',
+  `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态：0-拼团中，1-拼团成功，2-拼团失败',
+  `create_time` int NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `update_time` int NOT NULL DEFAULT 0 COMMENT '更新时间',
+  `delete_time` int NULL DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_activity_id`(`activity_id` ASC) USING BTREE,
+  INDEX `idx_user_id`(`user_id` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '拼团记录表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of hy_group_buying_record
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for hy_member
@@ -209,8 +341,10 @@ CREATE TABLE `hy_member`  (
   `openid` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '唯一识别号',
   `mobile` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '手机号',
   `userName` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '用户名',
-  `header_img` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '头像',
+  `avatar_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '头像',
   `realName` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '真实姓名',
+  `referrer_id` int NOT NULL DEFAULT 0 COMMENT '推荐人id',
+  `level` tinyint(1) NOT NULL DEFAULT 1 COMMENT '用户等级：1-普通用户，2-VIP用户，3-代理商',
   `status` tinyint(1) NOT NULL DEFAULT 1,
   `create_time` int NOT NULL DEFAULT 0,
   `update_time` int NOT NULL DEFAULT 0,
@@ -222,7 +356,7 @@ CREATE TABLE `hy_member`  (
 -- ----------------------------
 -- Records of hy_member
 -- ----------------------------
-INSERT INTO `hy_member` VALUES (1, '', '1233323', '', '', '', '', 1, 1681959726, 1681959726, NULL);
+INSERT INTO `hy_member` VALUES (1, '', '1233323', '', '', '', '', 0, 1, 1, 1681959726, 1681959726, NULL);
 
 -- ----------------------------
 -- Table structure for hy_member_token
@@ -270,7 +404,7 @@ CREATE TABLE `hy_menu`  (
   `update_time` int UNSIGNED NOT NULL DEFAULT 0,
   `delete_time` int UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 38 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 44 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of hy_menu
@@ -301,6 +435,34 @@ INSERT INTO `hy_menu` VALUES (34, '装修', 0, 'menu', '/layout/home', 'layout',
 INSERT INTO `hy_menu` VALUES (35, '页面装修', 34, 'menu', '/layout', 'layout', 'layout/home/index', '', 0, '', 0, 0, 0, 0, 'iconfont icon-zujian', 0, 1, 1680512402, 1680512607, NULL);
 INSERT INTO `hy_menu` VALUES (36, 'websocket', 0, 'menu', '/websocket', 'websocket', 'websocket/index', '', 0, '', 0, 0, 0, 0, 'iconfont icon-juxingkaobei', 0, 1, 1681181185, 1681181447, NULL);
 INSERT INTO `hy_menu` VALUES (37, '测试服务器', 0, 'menu', '/test', 'test', '/test', '', 0, '', 0, 0, 0, 0, 'iconfont icon-bolangneng', 0, 1, 1682327054, 1683789280, 1683789280);
+INSERT INTO `hy_menu` VALUES (38, '营销管理', 0, 'menu', '/secill/index', 'marketing', '/secill/index', '/secill/index', 0, '', 0, 0, 0, 0, 'ele-Basketball', 0, 1, 1684309835, 1684309835, NULL);
+INSERT INTO `hy_menu` VALUES (39, '分销管理', 38, 'menu', '/distribution', 'marketingDistribution', '/marketing/distribution/index', '', 0, '', 0, 0, 0, 0, 'iconfont icon-juxingkaobei', 0, 1, 1684309888, 1684310008, NULL);
+INSERT INTO `hy_menu` VALUES (40, '秒杀管理', 38, 'menu', '/seckill', 'marketingSeckill', '/marketing/seckill/index', '', 0, '', 0, 0, 0, 0, 'iconfont icon-shouye_dongtaihui', 0, 1, 1684310064, 1684310064, NULL);
+INSERT INTO `hy_menu` VALUES (41, '拼团管理', 38, 'menu', '/groupBuyingActivity', 'marketingGroupBuyingActivity', '/marketing/group_buying_activity/index', '', 0, '', 0, 0, 0, 0, 'iconfont icon-siweidaotu', 0, 1, 1684310169, 1684310187, NULL);
+INSERT INTO `hy_menu` VALUES (42, '优惠券管理', 38, 'menu', '/coupon', 'marketingCoupon', '/marketing/coupon/index', '', 0, '', 0, 0, 0, 0, 'ele-SoldOut', 0, 1, 1684310255, 1684310255, NULL);
+INSERT INTO `hy_menu` VALUES (43, '砍价管理', 38, 'menu', '/bargainActivity', 'marketingBargainActivity', '/marketing/bargain_activity/index', '', 0, '', 0, 0, 0, 0, 'fa fa-handshake-o', 0, 1, 1684310359, 1684310359, NULL);
+
+-- ----------------------------
+-- Table structure for hy_order
+-- ----------------------------
+DROP TABLE IF EXISTS `hy_order`;
+CREATE TABLE `hy_order`  (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '订单id',
+  `user_id` int NOT NULL COMMENT '用户id',
+  `product_id` int NOT NULL COMMENT '商品id',
+  `price` decimal(10, 2) NOT NULL COMMENT '价格',
+  `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态：0-待支付，1-已支付',
+  `create_time` int NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `update_time` int NOT NULL DEFAULT 0 COMMENT '更新时间',
+  `delete_time` int NULL DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
+  INDEX `idx_product_id`(`product_id` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '订单表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of hy_order
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for hy_role
@@ -326,6 +488,51 @@ CREATE TABLE `hy_role`  (
 INSERT INTO `hy_role` VALUES (1, '决类要律酸价', 'est minim exercitation incididunt consectetur', 0, 1, '到这习论义导观京系革打场角。阶界节矿的过入各须出示圆位金。现张史音共业快话农光天情心问个毛。低她温术色效命置期将真构复水标长名满。律周局教那大题法些认由白们何。相亲该五下维于标般四最机。', '[111, 112]', 1679108425, 1679108425, NULL);
 INSERT INTO `hy_role` VALUES (2, '123123', '23333', 0, 0, '', '[1, 2, 3, 4, 28, 5, 6]', 1679275974, 1679275974, NULL);
 INSERT INTO `hy_role` VALUES (3, '1111111', '2222', 0, 1, '', '[2, 3, 4, 28, 36]', 1682318321, 1682318321, NULL);
+
+-- ----------------------------
+-- Table structure for hy_seckill
+-- ----------------------------
+DROP TABLE IF EXISTS `hy_seckill`;
+CREATE TABLE `hy_seckill`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '秒杀活动名称',
+  `start_time` int NOT NULL DEFAULT 0 COMMENT '活动开始时间',
+  `end_time` int NOT NULL DEFAULT 0 COMMENT '活动结束时间',
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '活动状态 0-未开始 1-已开始 2-已结束',
+  `total_quantity` int NOT NULL DEFAULT 0 COMMENT '秒杀商品总数量',
+  `remain_quantity` int NOT NULL DEFAULT 0 COMMENT '秒杀商品剩余数量',
+  `create_time` int NOT NULL DEFAULT 0,
+  `update_time` int NOT NULL DEFAULT 0,
+  `delete_time` int NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '秒杀活动表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of hy_seckill
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for hy_seckill_record
+-- ----------------------------
+DROP TABLE IF EXISTS `hy_seckill_record`;
+CREATE TABLE `hy_seckill_record`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL DEFAULT 0 COMMENT '参与秒杀的用户ID',
+  `activity_id` int NOT NULL DEFAULT 0 COMMENT '秒杀活动编号',
+  `goods_id` int NOT NULL DEFAULT 0 COMMENT '秒杀商品编号',
+  `quantity` int NOT NULL DEFAULT 0 COMMENT '秒杀商品数量',
+  `status_pay` tinyint(1) NOT NULL DEFAULT 0 COMMENT '支付状态 0未支付 1支付成功 2支付失败',
+  `status_seckill` tinyint(1) NOT NULL DEFAULT 0 COMMENT '秒杀状态 0默认 1秒杀成功 2秒杀失败',
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `create_time` int NOT NULL DEFAULT 0,
+  `update_time` int NOT NULL DEFAULT 0,
+  `delete_time` int NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '秒杀记录表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of hy_seckill_record
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for hy_specs
@@ -498,6 +705,7 @@ DROP TABLE IF EXISTS `hy_user`;
 CREATE TABLE `hy_user`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
   `userName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '用户名',
+  `avatar_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '头像',
   `password` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '密码',
   `phone` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
   `sex` tinyint(1) NOT NULL DEFAULT 0 COMMENT '性别 0默认 2女 1男 3保密',
@@ -525,8 +733,8 @@ CREATE TABLE `hy_user`  (
 -- ----------------------------
 -- Records of hy_user
 -- ----------------------------
-INSERT INTO `hy_user` VALUES (1, 'admin', '6e7edcdd68ddd57fbc78dc46d1617315', '15212345678', 1, 'admin@admin.com', '', '今天的努力是为了实现小时候吹过的牛逼', '0ca175b9c0f726a831d895e269332461', '', 0, 00000000003232235529, 1684218348, 1, 1678957452, 1684218348, NULL);
-INSERT INTO `hy_user` VALUES (2, 'test1', '6e7edcdd68ddd57fbc78dc46d1617315', '', 0, '', '', '', '0ca175b9c0f726a831d895e269332461', '', 0, 00000000003232235529, 1682319023, 1, 1678957452, 1682319023, NULL);
-INSERT INTO `hy_user` VALUES (7, 'text1', 'aad8f1d954f8b18aaa58b9c99a73cb93', '13320251148', 0, '243194993@qq.com', '', '', 'bd2449dcbfff057acbd29e14a805ca31', '', 0, 00000000003232235529, 1684135302, 1, 1682317058, 1684135302, NULL);
+INSERT INTO `hy_user` VALUES (1, 'admin', '/public/image/2023-03-22/d7c22a4d1baca0ae99bc4d55f1abd534.jpeg', 'a7b43e4626e3e6f6744e7440b60f6006', '15212345678', 1, 'admin@admin.com', '', '今天的努力是为了实现小时候吹过的牛逼', 'e439e8c47f5d6a2a8c260127b59f24c4', '', 0, 00000000003232235529, 1684289987, 1, 1678957452, 1684306663, NULL);
+INSERT INTO `hy_user` VALUES (2, 'test1', '', '6e7edcdd68ddd57fbc78dc46d1617315', '', 0, '', '', '', '0ca175b9c0f726a831d895e269332461', '', 0, 00000000003232235529, 1682319023, 1, 1678957452, 1682319023, NULL);
+INSERT INTO `hy_user` VALUES (7, 'text1', '', 'aad8f1d954f8b18aaa58b9c99a73cb93', '13320251148', 0, '243194993@qq.com', '', '', 'bd2449dcbfff057acbd29e14a805ca31', '', 0, 00000000003232235529, 1684135302, 1, 1682317058, 1684135302, NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;
