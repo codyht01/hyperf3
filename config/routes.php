@@ -85,8 +85,17 @@ Router::addServer('http', function () {
         Router::post('test/ss', [\App\Controller\Api\TestController::class, 'ss']);
 
     }, ['middleware' => [\App\Middleware\HttpAuthMiddleware::class]]);
+    //不需要验证权限
     Router::addGroup('/member/', function () {
         Router::post('login/check', [\App\Controller\Member\LoginController::class, 'check']);
+    });
+    //需要验证权限
+    Router::addGroup('/member/', function () {
+        Router::post('user/getUserInfo', [\App\Controller\Member\LoginController::class, 'check']);
+    }, ['middleware' => [\App\Middleware\MemberAuthMiddleware::class]]);
+
+    Router::addGroup('/chat/', function () {
+        Router::post('chat/index', [\App\Controller\Chat\ChatController::class, 'chat']);
     });
 });
 Router::addServer('ws', function () {

@@ -20,7 +20,7 @@ use Hyperf\Context\ApplicationContext;
 
 class LoginController extends MemberBaseController
 {
-    protected $obj_bus;
+    protected MemberBusiness $obj_bus;
 
     public function __construct()
     {
@@ -32,7 +32,7 @@ class LoginController extends MemberBaseController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function check()
+    public function check(): \Psr\Http\Message\ResponseInterface
     {
         $type = $this->request->input('type', 'wx');
         $code = $this->request->input('code');
