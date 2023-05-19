@@ -24,37 +24,56 @@ class ChatController extends ChatBaseController
 {
     public function chat()
     {
+        $ch = curl_init();
 
+        curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/chat/completions');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
 
-        $parallel = new Parallel();
-        $parallel->add(function () {
-            $client = new Client('api.openai.com', 443, true);
-            $client->set([
-                'timeout' => 5,
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . env('CHAT_GPT_API', ''), // 替换为你的 API 密钥
-                ],
-            ]);
-            $data = [
-                'model' => 'gpt-3.5-turbo',
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You are a helpful assistant.'],
-                ],
-            ];
-            $client->post('/v1/chat/completions', json_encode($data));
-            $body = $client->getBody();
-            var_dump($body);
-            return Coroutine::id();
+        $headers = [
+            'Content-Type: application/json',
+            'Authorization: Bearer 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',
+        ];
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $data = [
+            'model' => 'gpt-3.5-turbo',
+            'messages' => [
+                ['role' => 'system', 'content' => 'You are a helpful assistant.'],
+                ['role' => 'user', 'content' => 'Who won the world series in 2020?'],
+                ['role' => 'assistant', 'content' => 'The Los Angeles Dodgers won the World Series in 2020.'],
+                ['role' => 'user', 'content' => 'Where was it played?'],
+            ],
+        ];
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+// 设置回调函数处理异步响应
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $headerLine) use (&$headers) {
+            $headers[] = $headerLine;
+            return strlen($headerLine);
         });
-        try {
-            // $results 结果为 [1, 2]
-            $results = $parallel->wait();
-        } catch (ParallelExecutionException $e) {
-            // $e->getResults() 获取协程中的返回值。
-            // $e->getThrowables() 获取协程中出现的异常。
-        }
-        var_dump($results);
+
+        $mh = curl_multi_init();
+        curl_multi_add_handle($mh, $ch);
+
+// 执行异步请求
+        do {
+            $status = curl_multi_exec($mh, $active);
+        } while ($status === CURLM_CALL_MULTI_PERFORM || $active);
+
+// 处理异步响应
+        $response = curl_multi_getcontent($ch);
+        $info = curl_getinfo($ch);
+
+        curl_multi_remove_handle($mh, $ch);
+        curl_multi_close($mh);
+        curl_close($ch);
+
+// 处理响应
+        $responseData = json_decode($response, true);
+        $answer = $responseData['choices'][0]['message']['content'];
+
+        echo $answer;
     }
 
     /**
