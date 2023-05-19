@@ -17,63 +17,58 @@ namespace App\Controller\Chat;
 use Hyperf\Coroutine\Parallel;
 use Hyperf\Coroutine\Coroutine;
 use Hyperf\Coroutine\Exception\ParallelExecutionException;
+use Hyperf\Guzzle\ClientFactory;
 use Swoole\Coroutine\Http\Client;
+use GuzzleHttp\Promise\Utils;
 
 
 class ChatController extends ChatBaseController
 {
+    private $clientFactory;
+
+    public function __construct(ClientFactory $clientFactory)
+    {
+        $this->clientFactory = $clientFactory;
+    }
+
     public function chat()
     {
-        $ch = curl_init();
+        $parallel = new Parallel();
+        $parallel->add(function () {
+            $client = $this->clientFactory->create();
+            $apiKey = env('CHAT_GPT_API');
+            $data = [
+                'model' => 'gpt-3.5-turbo',
+                'messages' => [
+                    ['role' => 'system', 'content' => 'You are a helpful assistant.'],
+                ],
+            ];
+            $responsePromise = $client->requestAsync('POST', 'https://api.openai.com/v1/chat/completions', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . $apiKey,
+                ],
+                'json' => $data,
+            ]);
+            var_dump($responsePromise);
+            $response = Utils::unwrap($responsePromise);
 
-        curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/chat/completions');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
+            $result = $response->getBody()->getContents();
 
-        $headers = [
-            'Content-Type: application/json',
-            'Authorization: Bearer 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',
-        ];
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            // 处理响应
+            $responseData = json_decode($result, true);
+            $answer = $responseData['choices'][0]['message']['content'];
 
-        $data = [
-            'model' => 'gpt-3.5-turbo',
-            'messages' => [
-                ['role' => 'system', 'content' => 'You are a helpful assistant.'],
-                ['role' => 'user', 'content' => 'Who won the world series in 2020?'],
-                ['role' => 'assistant', 'content' => 'The Los Angeles Dodgers won the World Series in 2020.'],
-                ['role' => 'user', 'content' => 'Where was it played?'],
-            ],
-        ];
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-
-// 设置回调函数处理异步响应
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $headerLine) use (&$headers) {
-            $headers[] = $headerLine;
-            return strlen($headerLine);
+            return Coroutine::id();
         });
-
-        $mh = curl_multi_init();
-        curl_multi_add_handle($mh, $ch);
-
-// 执行异步请求
-        do {
-            $status = curl_multi_exec($mh, $active);
-        } while ($status === CURLM_CALL_MULTI_PERFORM || $active);
-
-// 处理异步响应
-        $response = curl_multi_getcontent($ch);
-        $info = curl_getinfo($ch);
-
-        curl_multi_remove_handle($mh, $ch);
-        curl_multi_close($mh);
-        curl_close($ch);
-
-// 处理响应
-        $responseData = json_decode($response, true);
-        $answer = $responseData['choices'][0]['message']['content'];
-
-        echo $answer;
+        try {
+            // $results 结果为 [1, 2]
+            $results = $parallel->wait();
+        } catch (ParallelExecutionException $e) {
+            // $e->getResults() 获取协程中的返回值。
+            // $e->getThrowables() 获取协程中出现的异常。
+        }
+        var_dump($results);
     }
 
     /**
