@@ -33,7 +33,7 @@ class ChatController extends ChatBaseController
                 'timeout' => 5,
                 'headers' => [
                     'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer YOUR_API_KEY', // 替换为你的 API 密钥
+                    'Authorization' => 'Bearer ' . env('CHAT_GPT_API', ''), // 替换为你的 API 密钥
                 ],
             ]);
             $data = [
