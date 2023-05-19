@@ -13,60 +13,48 @@ declare(strict_types=1);
 
 namespace App\Controller\Chat;
 
-use Hyperf\HttpServer\Annotation\Controller;
-use Hyperf\HttpServer\Annotation\PostMapping;
-use Hyperf\Utils\Coroutine;
-use Hyperf\Utils\Parallel;
+
+use Hyperf\Coroutine\Parallel;
+use Hyperf\Coroutine\Coroutine;
+use Hyperf\Coroutine\Exception\ParallelExecutionException;
 use Swoole\Coroutine\Http\Client;
+
 
 class ChatController extends ChatBaseController
 {
     public function chat()
     {
-        $data = [
-            'model' => 'gpt-3.5-turbo',
-            'messages' => [
-                ['role' => 'system', 'content' => 'You are a helpful assistant.'],
-                ['role' => 'user', 'content' => 'Who won the world series in 2020?'],
-                ['role' => 'assistant', 'content' => 'The Los Angeles Dodgers won the World Series in 2020.'],
-                ['role' => 'user', 'content' => 'Where was it played?'],
-            ],
-        ];
 
-        $requests = [
-            $this->createChatRequest($data),
-        ];
 
         $parallel = new Parallel();
-        foreach ($requests as $request) {
-            $parallel->add(function () use ($request) {
-                $api_key = env('CHAT_GPT_API', '');
-                $client = new Client('api.openai.com', 443, true);
-                $send_data = [
-                    'timeout' => 5,
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . $api_key, // 替换为你的 API 密钥
-                    ],
-                ];
-                var_dump($send_data);
-                $client->set($send_data);
-                $client->post('/v1/chat/completions', json_encode($request));
-                $response = $client->body;
-                var_dump("这是结果----");
-                var_dump($response);
-                $client->close();
-
-                return $response;
-            });
+        $parallel->add(function () {
+            $client = new Client('api.openai.com', 443, true);
+            $client->set([
+                'timeout' => 5,
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer YOUR_API_KEY', // 替换为你的 API 密钥
+                ],
+            ]);
+            $data = [
+                'model' => 'gpt-3.5-turbo',
+                'messages' => [
+                    ['role' => 'system', 'content' => 'You are a helpful assistant.'],
+                ],
+            ];
+            $client->post('/v1/chat/completions', json_encode($data));
+            $body = $client->getBody();
+            var_dump($body);
+            return Coroutine::id();
+        });
+        try {
+            // $results 结果为 [1, 2]
+            $results = $parallel->wait();
+        } catch (ParallelExecutionException $e) {
+            // $e->getResults() 获取协程中的返回值。
+            // $e->getThrowables() 获取协程中出现的异常。
         }
-
-        $responses = $parallel->wait();
-        var_dump($responses);
-        // 处理响应
-        $answer = $this->parseChatResponse($responses[0]);
-        var_dump($answer);
-        return $answer;
+        var_dump($results);
     }
 
     /**
