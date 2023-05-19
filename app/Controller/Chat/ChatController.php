@@ -72,10 +72,11 @@ class ChatController extends ChatBaseController
      */
     private function createChatRequest($data)
     {
+        $api_key = env('CHAT_GPT_API', '');
         return [
             'headers' => [
                 'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer YOUR_API_KEY', // 替换为你的 API 密钥
+                'Authorization' => 'Bearer ' . $api_key, // 替换为你的 API 密钥
             ],
             'body' => json_encode($data),
         ];
