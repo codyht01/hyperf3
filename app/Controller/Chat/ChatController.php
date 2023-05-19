@@ -40,12 +40,13 @@ class ChatController extends ChatBaseController
         $parallel = new Parallel();
         foreach ($requests as $request) {
             $parallel->add(function () use ($request) {
+                $api_key = env('CHAT_GPT_API', '');
                 $client = new Client('api.openai.com', 443, true);
                 $client->set([
                     'timeout' => 5,
                     'headers' => [
                         'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer YOUR_API_KEY', // 替换为你的 API 密钥
+                        'Authorization' => 'Bearer ' . $api_key, // 替换为你的 API 密钥
                     ],
                 ]);
                 $client->post('/v1/chat/completions', json_encode($request));
@@ -57,7 +58,7 @@ class ChatController extends ChatBaseController
         }
 
         $responses = $parallel->wait();
-
+        var_dump($responses);
         // 处理响应
         $answer = $this->parseChatResponse($responses[0]);
         var_dump($answer);
