@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace App\Controller\Chat;
 
 
+use GuzzleHttp\Client;
 use Hyperf\Coroutine\Parallel;
 use Hyperf\Coroutine\Coroutine;
 use Hyperf\Coroutine\Exception\ParallelExecutionException;
 use Hyperf\Guzzle\ClientFactory;
-use Swoole\Coroutine\Http\Client;
 use GuzzleHttp\Promise\Utils;
+use Psr\Http\Message\ResponseInterface;
 
 
 class ChatController extends ChatBaseController
@@ -35,30 +36,36 @@ class ChatController extends ChatBaseController
     {
         $parallel = new Parallel();
         $parallel->add(function () {
-            $client = $this->clientFactory->create();
-            $apiKey = env('CHAT_GPT_API');
+            $client = new Client();
             $data = [
                 'model' => 'gpt-3.5-turbo',
                 'messages' => [
                     ['role' => 'system', 'content' => 'You are a helpful assistant.'],
+                    ['role' => 'user', 'content' => 'Who won the world series in 2020?'],
+                    ['role' => 'assistant', 'content' => 'The Los Angeles Dodgers won the World Series in 2020.'],
+                    ['role' => 'user', 'content' => 'Where was it played?'],
                 ],
             ];
-            $responsePromise = $client->requestAsync('POST', 'https://api.openai.com/v1/chat/completions', [
+            $promise = $client->postAsync('https://api.openai.com/v1/chat/completions', [
                 'headers' => [
                     'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Authorization' => 'Bearer ' . env('CHAT_GPT_API'),
                 ],
                 'json' => $data,
             ]);
-            $response = Utils::unwrap($responsePromise);
+            $promise->then(function (ResponseInterface $response) {
+                $result = $response->getBody()->getContents();
 
-            $result = $response->getBody()->getContents();
-            var_dump($result);
-            // 处理响应
-            $responseData = json_decode($result, true);
-            var_dump($responseData);
-            //$answer = $responseData['choices'][0]['message']['content'];
+                // 处理响应
+                $responseData = json_decode($result, true);
+                $answer = $responseData['choices'][0]['message']['content'];
 
+                // 在协程中回应请求
+                Coroutine::create(function () use ($answer) {
+                    // 返回响应
+                    return $answer;
+                });
+            });
             return Coroutine::id();
         });
         try {
