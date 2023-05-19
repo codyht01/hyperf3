@@ -46,13 +46,17 @@ class ChatController extends ChatBaseController
                     ['role' => 'user', 'content' => 'Where was it played?'],
                 ],
             ];
-            $promise = $client->postAsync('https://api.openai.com/v1/chat/completions', [
+            var_dump($data);
+            $send = [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Authorization' => 'Bearer ' . env('CHAT_GPT_API'),
                 ],
                 'json' => $data,
-            ]);
+            ];
+            var_dump($send);
+            $promise = $client->postAsync('https://api.openai.com/v1/chat/completions', $send);
+            var_dump($promise);
             $promise->then(function (ResponseInterface $response) {
                 $result = $response->getBody()->getContents();
 
