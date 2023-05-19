@@ -3,54 +3,36 @@ declare(strict_types=1);
 
 namespace App\Controller\Chat;
 
-use Hyperf\Coroutine\Parallel;
-use Hyperf\HttpServer\Annotation\Controller;
-use Hyperf\HttpServer\Annotation\PostMapping;
-
-use Swoole\Coroutine\Http\Client;
+use Swoole\Coroutine\Http2\Client;
 
 class ChatController
 {
     public function chat()
     {
-        $data = [
-            'model' => 'gpt-3.5-turbo',
-            'messages' => [
-                ['role' => 'assistant', 'content' => '如何煮鸡蛋'],
-            ],
-        ];
+        \Hyperf\Coroutine\go(function () {
+            $client = new \Swoole\Coroutine\Http\Client('api.openai.com', 443, true);
+            $headers = [
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer ' . env('CHAT_GPT_API'),
+            ];
+            $client->setHeaders($headers);
 
-        $requests = [
-            $this->createChatRequest($data),
-        ];
-
-        $parallel = new Parallel();
-        foreach ($requests as $request) {
-            $parallel->add(function () use ($request) {
-                $client = new Client('api.openai.com', 443, true);
-                $send = [
-                    'timeout' => 5,
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . env('CHAT_GPT_API'), // 替换为你的 API 密钥
-                    ],
-                ];
-                var_dump($send);
-                $client->set($send);
-                $client->post('/v1/chat/completions', json_encode($request));
-                $response = $client->body;
+            $client->post('/v1/chat/completions', '{"model":"gpt-3.5-turbo","messages":[{"role":"assistant","content":"请问如何煮鸡蛋"}]}');
+            // 协程挂起等待异步结果
+            while (true) {
+                $response = $client->recv();
+                if ($response === false || $response->statusCode === -1) {
+                    break;
+                }
                 var_dump($response);
-                $client->close();
-
-                return $response;
-            });
-        }
-
-        $responses = $parallel->wait();
-
-        // 处理响应
-        $answer = $this->parseChatResponse($responses[0]);
-        return $answer;
+                if ($response->statusCode === 200) {
+                    echo $response->body;
+                } else {
+                    echo '请求失败，状态码：' . $response->statusCode;
+                }
+            }
+            $client->close();
+        });
     }
 
     /**
