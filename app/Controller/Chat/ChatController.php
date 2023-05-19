@@ -53,11 +53,11 @@ class ChatController extends ChatBaseController
             $response = Utils::unwrap($responsePromise);
 
             $result = $response->getBody()->getContents();
-
+            var_dump($result);
             // 处理响应
             $responseData = json_decode($result, true);
             var_dump($responseData);
-            $answer = $responseData['choices'][0]['message']['content'];
+            //$answer = $responseData['choices'][0]['message']['content'];
 
             return Coroutine::id();
         });
