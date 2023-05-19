@@ -51,6 +51,8 @@ class ChatController extends ChatBaseController
                 ]);
                 $client->post('/v1/chat/completions', json_encode($request));
                 $response = $client->body;
+                var_dump("这是结果----");
+                var_dump($response);
                 $client->close();
 
                 return $response;
