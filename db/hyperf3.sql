@@ -11,7 +11,7 @@
  Target Server Version : 80030 (8.0.30)
  File Encoding         : 65001
 
- Date: 17/05/2023 16:25:26
+ Date: 23/05/2023 14:57:24
 */
 
 SET NAMES utf8mb4;
@@ -34,7 +34,7 @@ CREATE TABLE `hy_bargain_activity`  (
   `update_time` int NOT NULL DEFAULT 0 COMMENT '修改时间',
   `delete_time` int NULL DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '砍价活动表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '砍价活动表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of hy_bargain_activity
@@ -55,7 +55,7 @@ CREATE TABLE `hy_bargain_record`  (
   `delete_time` int NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uniq_activity_user`(`activity_id` ASC, `user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '砍价记录表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '砍价记录表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of hy_bargain_record
@@ -77,7 +77,7 @@ CREATE TABLE `hy_commission`  (
   INDEX `idx_product_id`(`product_id` ASC) USING BTREE,
   INDEX `idx_from_user_id`(`from_user_id` ASC) USING BTREE,
   INDEX `idx_to_user_id`(`to_user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '佣金表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '佣金表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of hy_commission
@@ -304,7 +304,7 @@ CREATE TABLE `hy_group_buying_activity`  (
   `delete_time` int NULL DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_product_id`(`product_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '拼团活动表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '拼团活动表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of hy_group_buying_activity
@@ -325,7 +325,7 @@ CREATE TABLE `hy_group_buying_record`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_activity_id`(`activity_id` ASC) USING BTREE,
   INDEX `idx_user_id`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '拼团记录表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '拼团记录表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of hy_group_buying_record
@@ -351,12 +351,13 @@ CREATE TABLE `hy_member`  (
   `delete_time` int NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uniq_openid`(`openid` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '前端用户信息' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '前端用户信息' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of hy_member
 -- ----------------------------
 INSERT INTO `hy_member` VALUES (1, '', '1233323', '', '', '', '', 0, 1, 1, 1681959726, 1681959726, NULL);
+INSERT INTO `hy_member` VALUES (2, '', 'out6p5NyFEwegoco_w_GMtDZf1nM', '', '', '', '', 0, 1, 1, 1684377362, 1684377362, NULL);
 
 -- ----------------------------
 -- Table structure for hy_member_token
@@ -371,12 +372,13 @@ CREATE TABLE `hy_member_token`  (
   `delete_time` int NULL DEFAULT NULL,
   `update_time` int NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '微信登陆session' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '微信登陆session' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of hy_member_token
 -- ----------------------------
 INSERT INTO `hy_member_token` VALUES (3, '22222', '1233323', 1, 0, NULL, 1681960344);
+INSERT INTO `hy_member_token` VALUES (4, 'fnVZnpWbad/2rG4IMnBf9w==', 'out6p5NyFEwegoco_w_GMtDZf1nM', 1, 0, NULL, 1684377362);
 
 -- ----------------------------
 -- Table structure for hy_menu
@@ -458,7 +460,7 @@ CREATE TABLE `hy_order`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
   INDEX `idx_product_id`(`product_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '订单表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '订单表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of hy_order
@@ -505,7 +507,7 @@ CREATE TABLE `hy_seckill`  (
   `update_time` int NOT NULL DEFAULT 0,
   `delete_time` int NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '秒杀活动表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '秒杀活动表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of hy_seckill
@@ -528,7 +530,7 @@ CREATE TABLE `hy_seckill_record`  (
   `update_time` int NOT NULL DEFAULT 0,
   `delete_time` int NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '秒杀记录表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '秒杀记录表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of hy_seckill_record
@@ -733,7 +735,7 @@ CREATE TABLE `hy_user`  (
 -- ----------------------------
 -- Records of hy_user
 -- ----------------------------
-INSERT INTO `hy_user` VALUES (1, 'admin', '/public/image/2023-03-22/d7c22a4d1baca0ae99bc4d55f1abd534.jpeg', 'a7b43e4626e3e6f6744e7440b60f6006', '15212345678', 1, 'admin@admin.com', '', '今天的努力是为了实现小时候吹过的牛逼', 'e439e8c47f5d6a2a8c260127b59f24c4', '', 0, 00000000003232235529, 1684289987, 1, 1678957452, 1684306663, NULL);
+INSERT INTO `hy_user` VALUES (1, 'admin', '/public/image/2023-03-22/d7c22a4d1baca0ae99bc4d55f1abd534.jpeg', 'a7b43e4626e3e6f6744e7440b60f6006', '15212345678', 1, 'admin@admin.com', '', '今天的努力是为了实现小时候吹过的牛逼', 'e439e8c47f5d6a2a8c260127b59f24c4', '', 0, 00000000003232235529, 1684376782, 1, 1678957452, 1684376782, NULL);
 INSERT INTO `hy_user` VALUES (2, 'test1', '', '6e7edcdd68ddd57fbc78dc46d1617315', '', 0, '', '', '', '0ca175b9c0f726a831d895e269332461', '', 0, 00000000003232235529, 1682319023, 1, 1678957452, 1682319023, NULL);
 INSERT INTO `hy_user` VALUES (7, 'text1', '', 'aad8f1d954f8b18aaa58b9c99a73cb93', '13320251148', 0, '243194993@qq.com', '', '', 'bd2449dcbfff057acbd29e14a805ca31', '', 0, 00000000003232235529, 1684135302, 1, 1682317058, 1684135302, NULL);
 
